@@ -7,4 +7,6 @@
 - Reports pH outliers so they can be planted separately
 - Devlops planting recommendations based on known relationships (i.e. what vegatables should/should not be planted together)
 - Creates a calendar of harvest dates
+- Soil quality
+- Watering needs
  
