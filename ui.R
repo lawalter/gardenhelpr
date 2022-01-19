@@ -1,35 +1,26 @@
-# intro -------------------------------------------------------------------
-
-# A BIRD BAND COLOR COMBINATION GENERATOR SHINY APP
-# Mar 2020
-
 # libraries ---------------------------------------------------------------
 
 library(tidyverse)
-
-#devtools::install_github("trestletech/shinyStore", force = TRUE)
 library(shinyStore)
 
 # ui ----------------------------------------------------------------------
 
 # Read data 
-
 clean_data <- read_csv("clean_data/plant_relationships.csv")
 
 # Define UI for application:
-
 ui <- 
   
   fluidPage(
     
     # CSS:
-    #includeCSS('www/colorband-app.css'),
+    includeCSS('www/main-css.css'),
     
     # Application title:
     fluidRow(
       column(
         width = 10, 
-        tags$h1("Garden HelpR"))),
+        tags$h1("Garden Helpr"))),
     
     # Sidebar with input options:
     sidebarLayout(
@@ -50,24 +41,33 @@ ui <-
       # Main panel:
       
       mainPanel(
-        h4("Garden composition:"),
-        verbatimTextOutput("plants"),
-        br(),
-        h4("Friends:"),
-        fluidRow(
-          column(width = 2, tableOutput("friend_list"))),
-        br(),
-        h4("Foes:"),
-        fluidRow(
-          column(width = 2, tableOutput("foe_list"))
-          ),
-        #br(),
-        textOutput("combo_count"),
-        br(),
-        #downloadButton("downloadData", "Download full .csv"),
+        tabsetPanel(
+          type = "tabs",
+          tabPanel(
+            "Friends & Foes", 
+            br(),
+            h4("Friends:"),
+            fluidRow(
+              column(width = 2, tableOutput("friend_list"))),
+            br(),
+            h4("Foes:"),
+            fluidRow(
+              column(width = 2, tableOutput("foe_list"))
+            ),
+            #br(),
+            textOutput("combo_count"),
+            br()
+            #downloadButton("downloadData", "Download full .csv")
+            ),
+          tabPanel("pH", verbatimTextOutput("pH")),
+          tabPanel("Sun", verbatimTextOutput("sun")),
+          tabPanel("Water", verbatimTextOutput("water")),
+          tabPanel("Dates", verbatimTextOutput("dates"))
+          )
         )
     )
   )
+  
 
 # server ------------------------------------------------------------------
 
@@ -153,6 +153,18 @@ server <- function(input, output, session) {
     }
     updateStore(session, "plantVector", isolate(input$plantVector))
   })
+  
+  # pH
+  output$pH <- renderPrint({"pH"})
+  
+  # Sun
+  output$sun <- renderPrint({"sun"})
+  
+  # Water
+  output$water <- renderPrint({"water"})
+  
+  # Dates
+  output$dates <- renderPrint({"Coming soon!"})
   
 }
 
