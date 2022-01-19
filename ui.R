@@ -7,6 +7,13 @@ library(shinyStore)
 
 # Read data 
 clean_data <- read_csv("clean_data/plant_relationships.csv")
+# Note
+# duplicate chamomile
+# remove fruit tree
+# remove rose
+# delete silverbeet
+# simplify beans?
+# remove all fruit trees?
 
 # Define UI for application:
 ui <- 
@@ -54,15 +61,36 @@ ui <-
             fluidRow(
               column(width = 2, tableOutput("foe_list"))
             ),
-            #br(),
-            textOutput("combo_count"),
             br()
             #downloadButton("downloadData", "Download full .csv")
             ),
-          tabPanel("pH", verbatimTextOutput("pH")),
-          tabPanel("Sun", verbatimTextOutput("sun")),
-          tabPanel("Water", verbatimTextOutput("water")),
-          tabPanel("Dates", verbatimTextOutput("dates"))
+          tabPanel(
+            "pH", 
+            h4("pH:"),
+            br(),
+            verbatimTextOutput("pH")),
+          tabPanel(
+            "Sun", 
+            h4("Sun:"),
+            br(),
+            verbatimTextOutput("sun")),
+          tabPanel(
+            "Water", 
+            h4("Water:"),
+            br(),
+            verbatimTextOutput("water")),
+          tabPanel(
+            "Dates", 
+            h4("Dates:"),
+            br(),
+            verbatimTextOutput("dates")),
+          tabPanel(
+            "About", 
+            h4("About:"),
+            br(),
+            h5("American varieties were chosen over others when possible (e.g. mulberry and pennyroyal)."),
+            br(),
+            verbatimTextOutput("about"))
           )
         )
     )
@@ -165,6 +193,9 @@ server <- function(input, output, session) {
   
   # Dates
   output$dates <- renderPrint({"Coming soon!"})
+  
+  # About
+  output$about <- renderPrint({"Coming soon!"})
   
 }
 
