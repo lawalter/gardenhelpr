@@ -6,14 +6,23 @@ library(shinyStore)
 # ui ----------------------------------------------------------------------
 
 # Read data 
-clean_data <- read_csv("clean_data/plant_relationships.csv")
+clean_data <- 
+  read_csv("clean_data/plant_relationships.csv") %>% 
+  filter(!str_detect(plant, "Fruit Trees") &
+           !str_detect(second_plant, "Fruit Trees") &
+           !str_detect(plant, "Apple") & 
+           !str_detect(second_plant, "Apple") &
+           !str_detect(plant, "Apricot") &
+           !str_detect(second_plant, "Apricot") &
+           !str_detect(plant, "Silverbeet") & 
+           !str_detect(second_plant, "Silverbeet") & 
+           !str_detect(plant, "Roses") &
+           !str_detect(second_plant, "Roses") &
+           !str_detect(plant, "Mulberry") &
+           !str_detect(second_plant, "Mulberry"))
 # Note
-# duplicate chamomile
-# remove fruit tree
-# remove rose
-# delete silverbeet
+# duplicate chamomile?
 # simplify beans?
-# remove all fruit trees?
 
 # Define UI for application:
 ui <- 
@@ -109,6 +118,7 @@ get_friends <-
       filter(plant %in% plants) %>% 
       filter(relationship == "Companions") %>% 
       select(-relationship) %>% 
+      arrange(second_plant) %>% 
       mutate(second_plant = str_flatten(second_plant, collapse = ", ")) %>% 
       distinct()}
     else{NULL}
@@ -122,6 +132,7 @@ get_foes <-
       filter(plant %in% plants) %>% 
       filter(relationship == "Antagonists") %>% 
         select(-relationship) %>% 
+        arrange(second_plant) %>% 
         mutate(second_plant = str_flatten(second_plant, collapse = ", ")) %>%
         distinct()}
     else{NULL}
