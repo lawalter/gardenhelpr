@@ -1,7 +1,5 @@
 plant,latin_name,cultivar_group
-Apple,Malus domestica,
-Apricot,Prunus armeniaca,
-Aspargus,Asparagus officinalis,
+Asparagus,Asparagus officinalis,
 Basil,Ocimum basilicum,
 Beans,Phaseolus vulgaris,
 Broad Beans,Vicia faba,
@@ -34,7 +32,6 @@ Kohlrabi,"	Brassica oleracea",gonngylodes
 Lettuce,Lactuca sativa,
 Marjoram,Origanum majorana,
 Mustard,Brassica juncea,
-Mulberry,Morus rubra,
 Nasturtium,Tropaeolum majus,
 Onions,Allium cepa,
 Oregano,Origanum vulgare,
