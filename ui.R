@@ -19,9 +19,9 @@ clean_data <-
            !str_detect(plant, "Roses") &
            !str_detect(second_plant, "Roses") &
            !str_detect(plant, "Mulberry") &
-           !str_detect(second_plant, "Mulberry"))
+           !str_detect(second_plant, "Mulberry")) 
+
 # Note
-# duplicate chamomile?
 # simplify beans?
 
 # Define UI for application:
@@ -97,7 +97,7 @@ ui <-
             "About", 
             h4("About:"),
             br(),
-            h5("American varieties were chosen over others when possible (e.g. mulberry and pennyroyal)."),
+            h5("American varieties were chosen over others when possible (e.g., pennyroyal)."),
             br(),
             verbatimTextOutput("about"))
           )
@@ -114,13 +114,15 @@ ui <-
 get_friends <-
   function(x, plants) {
     if(length(plants) > 0){
-    x %>% 
-      filter(plant %in% plants) %>% 
-      filter(relationship == "Companions") %>% 
-      select(-relationship) %>% 
-      arrange(second_plant) %>% 
-      mutate(second_plant = str_flatten(second_plant, collapse = ", ")) %>% 
-      distinct()}
+      x %>% 
+        filter(plant %in% plants) %>% 
+        filter(relationship == "Companions") %>% 
+        select(-relationship) %>% 
+        arrange(second_plant) %>% 
+        group_by(plant) %>% 
+        mutate(second_plant = str_flatten(second_plant, collapse = ", ")) %>%
+        ungroup() %>% 
+        distinct()}
     else{NULL}
   }
 
@@ -128,12 +130,14 @@ get_friends <-
 get_foes <-
   function(x, plants) {
     if(length(plants) > 0){
-    x %>% 
-      filter(plant %in% plants) %>% 
-      filter(relationship == "Antagonists") %>% 
+      x %>% 
+        filter(plant %in% plants) %>% 
+        filter(relationship == "Antagonists") %>% 
         select(-relationship) %>% 
         arrange(second_plant) %>% 
+        group_by(plant) %>% 
         mutate(second_plant = str_flatten(second_plant, collapse = ", ")) %>%
+        ungroup() %>% 
         distinct()}
     else{NULL}
   }
