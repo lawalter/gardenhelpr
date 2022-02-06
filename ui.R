@@ -6,20 +6,7 @@ library(shinyStore)
 # ui ----------------------------------------------------------------------
 
 # Read data 
-clean_data <- 
-  read_csv("clean_data/plant_relationships.csv") %>% 
-  filter(!str_detect(plant, "Fruit Trees") &
-           !str_detect(second_plant, "Fruit Trees") &
-           !str_detect(plant, "Apple") & 
-           !str_detect(second_plant, "Apple") &
-           !str_detect(plant, "Apricot") &
-           !str_detect(second_plant, "Apricot") &
-           !str_detect(plant, "Silverbeet") & 
-           !str_detect(second_plant, "Silverbeet") & 
-           !str_detect(plant, "Roses") &
-           !str_detect(second_plant, "Roses") &
-           !str_detect(plant, "Mulberry") &
-           !str_detect(second_plant, "Mulberry")) 
+clean_data <- read_csv("clean_data/plant_relationships.csv")  
 
 # Note
 # simplify beans?
@@ -62,13 +49,14 @@ ui <-
           tabPanel(
             "Friends & Foes", 
             br(),
-            h4("Friends:"),
+            fluidRow(plotOutput("ffPlot")),
+            h4("Friends (comprehensive list):"),
             fluidRow(
-              column(width = 2, tableOutput("friend_list"))),
+              column(width = 10, tableOutput("friend_list"))),
             br(),
-            h4("Foes:"),
+            h4("Foes (comprehensive list):"),
             fluidRow(
-              column(width = 2, tableOutput("foe_list"))
+              column(width = 10, tableOutput("foe_list"))
             ),
             br()
             #downloadButton("downloadData", "Download full .csv")
@@ -88,11 +76,6 @@ ui <-
             h4("Water:"),
             br(),
             verbatimTextOutput("water")),
-          tabPanel(
-            "Dates", 
-            h4("Dates:"),
-            br(),
-            verbatimTextOutput("dates")),
           tabPanel(
             "About", 
             h4("About:"),
@@ -161,6 +144,31 @@ server <- function(input, output, session) {
   # Vector of plants chosen:
   output$plants <- renderText(input$plantVector)
   
+  # Plot of friends and foes:
+  output$ffPlot <- 
+    renderPlot({
+      clean_data %>% 
+        filter(plant %in% input$plantVector) %>% 
+        filter(second_plant %in% plant) %>% 
+        ggplot(aes(x = second_plant, y = plant, fill = relationship)) +
+        geom_tile() +
+        coord_equal(expand = T) +
+        labs(x = NULL, y = NULL) +
+        theme_minimal() +
+        theme(
+          panel.grid = element_blank(),
+          axis.text.x = element_text(family = "mono"),
+          axis.text.y = element_text(family = "mono"),
+          axis.title.y = element_text(family = "mono"),
+          legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.direction = "vertical",
+          plot.margin = unit(c(0, 0, 0, 0), "cm")) +
+        scale_fill_manual(
+          labels = c("Companions", "Antagonists"),
+          values = c("#7AD151", "#FDE725"))
+    })
+  
   # Friend list:
   output$friend_list <-
     renderTable({dataFriends()},
@@ -205,9 +213,6 @@ server <- function(input, output, session) {
   
   # Water
   output$water <- renderPrint({"water"})
-  
-  # Dates
-  output$dates <- renderPrint({"Coming soon!"})
   
   # About
   output$about <- renderPrint({"Coming soon!"})
