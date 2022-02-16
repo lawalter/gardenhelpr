@@ -6,3 +6,4 @@
 # collards
 # leek
 # arugula
+# artichoke
