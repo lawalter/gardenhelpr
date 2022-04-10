@@ -11,11 +11,11 @@ Based on your input of desired garden plants, gardenhelpr will:
 - Calculate average sunlight requirements
 - Report pH, water, and sunlight outliers so they can be planted separately
 
-## Attribution
+## Data sources
 
 - Companion planting data sourced from: <a href="https://waldenlabs.com/the-ultimate-companion-planting-guide-chart/">Walden Labs</a>
 
-## Other Resources
+## Suggested reading
 
 ### Companion Planting
 - Burpee: https://www.burpee.com/blog/companion-planting-guide_article10888.html
