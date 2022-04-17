@@ -1,6 +1,8 @@
 # gardenhelpr
 [In development] An R Shiny app to assist in backyard garden planning, from pH to plant relationships
 
+<img src="images/gh_app_m.png">
+
 ## Functionality 
 
 Based on your input of desired garden plants, gardenhelpr will:
