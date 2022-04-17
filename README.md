@@ -21,7 +21,7 @@ Based on your input of desired garden plants, gardenhelpr will:
 
 ### Companion Planting
 - Burpee: https://www.burpee.com/blog/companion-planting-guide_article10888.html
-- Farmer's Almanac: https://www.almanac.com/companion-planting-guide-vegetables#
+- Farmer's Almanac: https://www.almanac.com/companion-planting-guide-vegetables
 - Gardening Data: https://www.gardeningdata.co.uk/powen/guides/companion-planting.php
-- World Water Reserve: https://worldwaterreserve.com/companion-planting-charts-guides-pdfs/
- 
+- World Water Reserve: https://worldwaterreserve.com/companion-planting-charts-guides-pdfs
+- West Coast Seeds: https://www.westcoastseeds.com/blogs/garden-wisdom/companion-planting
