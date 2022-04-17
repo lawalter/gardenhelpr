@@ -8,13 +8,25 @@ library(shinyStore)
 # Read data 
 clean_data <- read_csv("clean_data/plant_relationships.csv")  
 
-# Note
-# simplify beans?
+# Set up multiple columns for checkboxGroupInput
+tweaks <- 
+  list(
+    tags$head(
+      tags$style(
+        HTML(".multicol { 
+          height: 750px;
+          -webkit-column-count: 2; /* Chrome, Safari, Opera */ 
+          -moz-column-count: 2;    /* Firefox */ 
+          column-count: 2 
+          -moz-column-fill: auto;
+          -column-fill: auto;} "))))
 
 # Define UI for application:
 ui <- 
   
   fluidPage(
+    # Multi col check boxes
+    tweaks,
     
     # CSS:
     includeCSS('www/main-css.css'),
@@ -32,14 +44,24 @@ ui <-
         # Initialize shinyStore:
         initStore("store", "shinyStore-mac-app"),
         
-        # Colors checkbox input:
-        checkboxGroupInput("plantVector",
-                           "Fruits and vegetables:",
-                           choices = NULL,
-                           selected = NULL),
+        # Plants checkbox input:
+        # checkboxGroupInput("plantVector",
+        #                    "Fruits and vegetables:",
+        #                    choices = NULL,
+        #                    selected = NULL),
+        list(h3("Fruits and veggies"),
+             tags$div(align = 'left',
+                      class = 'multicol',
+                      checkboxGroupInput(inputId  = 'plantVector',
+                                         label    = NULL,
+                                         choices  = NULL,
+                                         selected = NULL,
+                                         inline   = FALSE))),
         
         actionButton("go", "Save choices", 
-                     icon("crow", lib = "font-awesome"))),
+                     icon("crow", lib = "font-awesome")),
+        
+        width = 5),
       
       # Main panel:
       
@@ -83,7 +105,8 @@ ui <-
             h5("American varieties were chosen over others when possible (e.g., pennyroyal)."),
             br(),
             verbatimTextOutput("about"))
-          )
+          ),
+        width = 5
         )
     )
   )
@@ -157,16 +180,17 @@ server <- function(input, output, session) {
         theme_minimal() +
         theme(
           panel.grid = element_blank(),
-          axis.text.x = element_text(family = "mono"),
-          axis.text.y = element_text(family = "mono"),
-          axis.title.y = element_text(family = "mono"),
+          axis.text.x = 
+            element_text(
+              family = "mono", size = 15, angle = 45, hjust = 0.95),
+          axis.text.y = element_text(family = "mono", size = 15),
+          axis.title.y = element_text(family = "mono", size = 15),
           legend.position = "bottom",
           legend.title = element_blank(),
+          legend.text = element_text(family = "mono", size = 15),
           legend.direction = "vertical",
           plot.margin = unit(c(0, 0, 0, 0), "cm")) +
-        scale_fill_manual(
-          labels = c("Companions", "Antagonists"),
-          values = c("#7AD151", "#FDE725"))
+        scale_fill_manual(values = c("#FDE725", "#7AD151"))
     })
   
   # Friend list:
@@ -223,4 +247,4 @@ server <- function(input, output, session) {
 
 # Run the application:
 
-shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server, options = list(height = 1080))
