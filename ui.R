@@ -8,26 +8,10 @@ library(shinyStore)
 # Read data 
 clean_data <- read_csv("clean_data/plant_relationships.csv")  
 
-# Set up multiple columns for checkboxGroupInput
-tweaks <- 
-  list(
-    tags$head(
-      tags$style(
-        HTML(".multicol { 
-          height: 750px;
-          -webkit-column-count: 2; /* Chrome, Safari, Opera */ 
-          -moz-column-count: 2;    /* Firefox */ 
-          column-count: 2 
-          -moz-column-fill: auto;
-          -column-fill: auto;} "))))
-
 # Define UI for application:
 ui <- 
   
   fluidPage(
-    # Multi col check boxes
-    tweaks,
-    
     # CSS:
     includeCSS('www/main-css.css'),
     
@@ -45,11 +29,7 @@ ui <-
         initStore("store", "shinyStore-mac-app"),
         
         # Plants checkbox input:
-        # checkboxGroupInput("plantVector",
-        #                    "Fruits and vegetables:",
-        #                    choices = NULL,
-        #                    selected = NULL),
-        list(h3("Fruits and veggies"),
+        list(h3("Choose your plants"),
              tags$div(align = 'left',
                       class = 'multicol',
                       checkboxGroupInput(inputId  = 'plantVector',
@@ -80,31 +60,28 @@ ui <-
             fluidRow(
               column(width = 10, tableOutput("foe_list"))
             ),
-            br()
-            #downloadButton("downloadData", "Download full .csv")
+            br(),
+            downloadButton("downloadData", "Download full list as .csv")
             ),
           tabPanel(
             "pH", 
-            h4("pH:"),
+            h3("pH"),
             br(),
             verbatimTextOutput("pH")),
           tabPanel(
             "Sun", 
-            h4("Sun:"),
+            h3("Sun"),
             br(),
             verbatimTextOutput("sun")),
           tabPanel(
             "Water", 
-            h4("Water:"),
+            h3("Water"),
             br(),
             verbatimTextOutput("water")),
           tabPanel(
-            "About", 
-            h4("About:"),
-            br(),
-            h5("American varieties were chosen over others when possible (e.g., pennyroyal)."),
-            br(),
-            verbatimTextOutput("about"))
+            "About",
+            h3("About"),
+            uiOutput("about"))
           ),
         width = 5
         )
@@ -190,7 +167,8 @@ server <- function(input, output, session) {
           legend.text = element_text(family = "mono", size = 15),
           legend.direction = "vertical",
           plot.margin = unit(c(0, 0, 0, 0), "cm")) +
-        scale_fill_manual(values = c("#FDE725", "#7AD151"))
+          scale_fill_manual(
+            values = c("Antagonists" = "#FDE725", "Companions" = "#7AD151"))
     })
   
   # Friend list:
@@ -209,13 +187,25 @@ server <- function(input, output, session) {
                 hover = FALSE,
                 colnames = FALSE)
   
-  # # All random combinations in a download-friendly format:
-  # combo_list_csv <- reactive({dataInput()})
-  # 
-  # # Download handler:
-  # output$downloadData <- downloadHandler(
-  #   filename = paste0("colorband_list-", Sys.Date(), ".csv"),
-  #   content = function(file){write.csv(combo_list_csv(), file)})
+  # All plants & their friends/does in a download-friendly format:
+  combo_list_csv <- 
+    reactive({
+      bind_rows(
+        get_friends(clean_data, input$plantVector) %>% 
+          mutate(type = "friends"),
+        get_foes(clean_data, input$plantVector) %>% 
+          mutate(type = "foes")) %>% 
+        rename(list = second_plant) %>% 
+        relocate(type, .before = "list") %>% 
+        arrange(plant)})
+
+  # Download handler:
+  output$downloadData <- 
+    downloadHandler(
+      filename = 
+        function(){paste0("plant_list-", Sys.Date(), ".csv")},
+      content = 
+        function(file){write.csv(combo_list_csv(), file, row.names = F)})
   
   # Memory using shinyStore for color checkbox input:
   observe({
@@ -239,7 +229,15 @@ server <- function(input, output, session) {
   output$water <- renderPrint({"water"})
   
   # About
-  output$about <- renderPrint({"Coming soon!"})
+  output$about <- 
+    renderUI({
+      HTML(
+        "<h4>Creator: Abby Walter
+        <br>Contact: lawalter@vcu.edu
+        <br>Repository: <a href = 'https://github.com/lawalter/gardenhelpr'>https://github.com/lawalter/gardenhelpr</a></br></br>
+        <p>Notes:</p></h4>
+        <p>
+        <ul><li>American varieties were chosen over others when possible (e.g., pennyroyal).</li></ul></p>")})
   
 }
 
@@ -247,4 +245,7 @@ server <- function(input, output, session) {
 
 # Run the application:
 
-shinyApp(ui = ui, server = server, options = list(height = 1080))
+shinyApp(
+  ui = ui, 
+  server = server, 
+  options = list(height = 1080))
