@@ -29,7 +29,7 @@ comments <-
   filter(!is.na(comment)) %>% 
   select(-c("second_plant", "relationship"))
 
-clean_data <-
+clean_data2 <-
   raw_wldata %>% 
   filter(is.na(comment)) %>% 
   select(-comment) %>% 
@@ -98,7 +98,11 @@ clean_data <-
         plant == "Climbing Beans" ~ "Beans (climbing)",
         plant == "Bush Beans" ~ "Beans (bush)",
         plant == "Beans" ~  "Beans (all)",
-        TRUE ~ plant))
+        TRUE ~ plant)) 
 
+# Post-hoc fix to remove garlic listed as peas companion
+clean_data2 <- 
+  clean_data %>% 
+  filter(!(plant == "Garlic" & second_plant == "Peas" & relationship == "Companions"))
 
-write.csv(clean_data, "clean_data/plant_relationships.csv", row.names = F)
+write.csv(clean_data2, "clean_data/plant_relationships.csv", row.names = F)
