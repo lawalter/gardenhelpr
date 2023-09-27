@@ -233,7 +233,6 @@ server <- function(input, output, session) {
     renderUI({
       HTML(
         "<h4>Creator: Abby Walter
-        <br>Contact: lawalter@vcu.edu
         <br>Repository: <a href = 'https://github.com/lawalter/gardenhelpr'>https://github.com/lawalter/gardenhelpr</a></br></br>
         <p>Notes:</p></h4>
         <p>
