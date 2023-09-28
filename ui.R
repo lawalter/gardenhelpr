@@ -64,21 +64,6 @@ ui <-
             downloadButton("downloadData", "Download full list as .csv")
             ),
           tabPanel(
-            "pH", 
-            h3("pH"),
-            br(),
-            verbatimTextOutput("pH")),
-          tabPanel(
-            "Sun", 
-            h3("Sun"),
-            br(),
-            verbatimTextOutput("sun")),
-          tabPanel(
-            "Water", 
-            h3("Water"),
-            br(),
-            verbatimTextOutput("water")),
-          tabPanel(
             "About",
             h3("About"),
             uiOutput("about"))
@@ -218,15 +203,6 @@ server <- function(input, output, session) {
     }
     updateStore(session, "plantVector", isolate(input$plantVector))
   })
-  
-  # pH
-  output$pH <- renderPrint({"pH"})
-  
-  # Sun
-  output$sun <- renderPrint({"sun"})
-  
-  # Water
-  output$water <- renderPrint({"water"})
   
   # About
   output$about <- 
