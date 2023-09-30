@@ -25,6 +25,20 @@ raw_wldata <-
   dplyr::rename(second_plant = X1) |> 
   dplyr::relocate(plant, .before = "second_plant")
 
+# Reflexive completion
+# Not all relationships are included; for example, Basil has Chamomile listed as
+# a companion, but Chamomile does not have Basil listed as a companion
+completed_raw_data <-
+  raw_wldata |> 
+  rbind(
+    raw_wldata |> 
+      dplyr::rename(
+        second_plant = plant,
+        plant = second_plant) |> 
+      dplyr::relocate(plant, .before = "second_plant")
+  ) |> 
+  dplyr::distinct()
+
 # Define plants unwanted in final output
 excluded <-
   c("Fruit Trees", "Apple", "Apricot", "Cherry", "Grape", "Blackberries",
@@ -33,7 +47,7 @@ excluded <-
 
 # Clean up raw data
 clean_data <-
-  raw_wldata |> 
+  completed_raw_data |> 
   dplyr::filter(is.na(comment)) |> 
   dplyr::select(-comment) |> 
   # Filter out excluded plants

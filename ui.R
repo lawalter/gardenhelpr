@@ -25,7 +25,6 @@ ui <-
     # Sidebar with input options:
     sidebarLayout(
       sidebarPanel(
-        
         # Initialize shinyStore:
         initStore("store", "shinyStore-mac-app"),
         
@@ -47,8 +46,8 @@ ui <-
       # Main panel:
       
       mainPanel(
+        br(),
         h3("Friends & Foes"), 
-          br(),
           fluidRow(plotOutput("ffPlot")),
         h4("Friends (comprehensive list):"),
           fluidRow(column(width = 10, tableOutput("friend_list"))),
@@ -140,11 +139,11 @@ server <- function(input, output, session) {
           legend.text = 
             ggplot2::element_text(size = 15),
           legend.direction = "vertical",
-          plot.margin = 
+          plot.margin =
             ggplot2::unit(c(0, 0, 0, 0), "cm")) +
         ggplot2::scale_fill_manual(
-          values = c("Antagonists" = "#FDE725", "Companions" = "#7AD151"))
-    })
+          values = c("Antagonists" = "#3a1e04", "Companions" = "#7AD151"))
+    }, bg = "transparent")
   
   # Friend list:
   output$friend_list <-
