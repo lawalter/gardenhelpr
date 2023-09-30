@@ -1,25 +1,26 @@
 # libraries ---------------------------------------------------------------
 
-library(tidyverse)
 library(shinyStore)
+library(fresh)
 
 # ui ----------------------------------------------------------------------
 
 # Read data 
-clean_data <- read_csv("clean_data/plant_relationships.csv")  
+clean_data <- readr::read_csv("clean_data/plant_relationships.csv")  
 
 # Define UI for application:
 ui <- 
   
   fluidPage(
     # CSS:
+    includeCSS('www/freshtheme.css'),
     includeCSS('www/main-css.css'),
     
     # Application title:
     fluidRow(
       column(
         width = 10, 
-        tags$h1("Garden Helpr"))),
+        tags$h1("Gardenhelpr"))),
     
     # Sidebar with input options:
     sidebarLayout(
@@ -39,38 +40,36 @@ ui <-
                                          inline   = FALSE))),
         
         actionButton("go", "Save choices", 
-                     icon("crow", lib = "font-awesome")),
+                     icon("carrot", lib = "font-awesome")),
         
         width = 5),
       
       # Main panel:
       
       mainPanel(
-        tabsetPanel(
-          type = "tabs",
-          tabPanel(
-            "Friends & Foes", 
-            br(),
-            fluidRow(plotOutput("ffPlot")),
-            h4("Friends (comprehensive list):"),
-            fluidRow(
-              column(width = 10, tableOutput("friend_list"))),
-            br(),
-            h4("Foes (comprehensive list):"),
-            fluidRow(
-              column(width = 10, tableOutput("foe_list"))
-            ),
-            br(),
-            downloadButton("downloadData", "Download full list as .csv")
-            ),
-          tabPanel(
-            "About",
-            h3("About"),
-            uiOutput("about"))
-          ),
+        h3("Friends & Foes"), 
+          br(),
+          fluidRow(plotOutput("ffPlot")),
+        h4("Friends (comprehensive list):"),
+          fluidRow(column(width = 10, tableOutput("friend_list"))),
+          br(),
+        h4("Foes (comprehensive list):"),
+          fluidRow(column(width = 10, tableOutput("foe_list"))),
+          br(),
+          downloadButton("downloadData", "Download full list as .csv"),
+          br(),
         width = 5
         )
-    )
+      ),
+      
+    # Footer
+    hr(),
+    HTML(
+      "<b>Created by:</b> Abby Walter
+      <br><b>Repository:</b> <a href = 'https://github.com/lawalter/gardenhelpr'>https://github.com/lawalter/gardenhelpr</a></br></br>
+      <p><i>Note:</i> American varieties were chosen over others when possible (e.g., pennyroyal).</p>"
+      )
+    
   )
   
 
@@ -78,36 +77,22 @@ ui <-
 
 # Define functions
 
-# Friends of plants chosen:
-get_friends <-
-  function(x, plants) {
+# Get friends or foes of plants chosen:
+get_type <-
+  function(x, plants, type) {
     if(length(plants) > 0){
-      x %>% 
-        filter(plant %in% plants) %>% 
-        filter(relationship == "Companions") %>% 
-        select(-relationship) %>% 
-        arrange(second_plant) %>% 
-        group_by(plant) %>% 
-        mutate(second_plant = str_flatten(second_plant, collapse = ", ")) %>%
-        ungroup() %>% 
-        distinct()}
-    else{NULL}
-  }
-
-# Foes of plants chosen:
-get_foes <-
-  function(x, plants) {
-    if(length(plants) > 0){
-      x %>% 
-        filter(plant %in% plants) %>% 
-        filter(relationship == "Antagonists") %>% 
-        select(-relationship) %>% 
-        arrange(second_plant) %>% 
-        group_by(plant) %>% 
-        mutate(second_plant = str_flatten(second_plant, collapse = ", ")) %>%
-        ungroup() %>% 
-        distinct()}
-    else{NULL}
+      x |> 
+        dplyr::filter(plant %in% plants) |> 
+        dplyr::filter(relationship == type) |> 
+        dplyr::select(-relationship) |> 
+        dplyr::arrange(second_plant) |> 
+        dplyr::group_by(plant) |> 
+        dplyr::mutate(
+          second_plant = 
+            stringr::str_flatten(second_plant, collapse = ", ")) |>
+        dplyr::ungroup() |> 
+        dplyr::distinct()}
+    else{ NULL }
   }
 
 # Define server logic:
@@ -119,11 +104,11 @@ server <- function(input, output, session) {
   
   # Reactive:
   dataFriends <- reactive({
-    get_friends(clean_data, input$plantVector)
+    get_type(clean_data, input$plantVector, "Companions")
   })
   
   dataFoes <- reactive({
-    get_foes(clean_data, input$plantVector)
+    get_type(clean_data, input$plantVector, "Antagonists")
   })
   
   # Vector of plants chosen:
@@ -132,28 +117,33 @@ server <- function(input, output, session) {
   # Plot of friends and foes:
   output$ffPlot <- 
     renderPlot({
-      clean_data %>% 
-        filter(plant %in% input$plantVector) %>% 
-        filter(second_plant %in% plant) %>% 
-        ggplot(aes(x = second_plant, y = plant, fill = relationship)) +
-        geom_tile() +
-        coord_equal(expand = T) +
-        labs(x = NULL, y = NULL) +
-        theme_minimal() +
-        theme(
-          panel.grid = element_blank(),
+      clean_data |> 
+        dplyr::filter(plant %in% input$plantVector) |> 
+        dplyr::filter(second_plant %in% plant) |> 
+        ggplot2::ggplot(
+          ggplot2::aes(x = second_plant, y = plant, fill = relationship)) +
+        ggplot2::geom_tile() +
+        ggplot2::coord_equal(expand = T) +
+        ggplot2::labs(x = NULL, y = NULL) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          panel.grid = ggplot2::element_blank(),
           axis.text.x = 
-            element_text(
-              family = "mono", size = 15, angle = 45, hjust = 0.95),
-          axis.text.y = element_text(family = "mono", size = 15),
-          axis.title.y = element_text(family = "mono", size = 15),
+            ggplot2::element_text(
+              size = 15, angle = 45, hjust = 0.95),
+          axis.text.y = 
+            ggplot2::element_text(size = 15),
+          axis.title.y = 
+            ggplot2::element_text(size = 15),
           legend.position = "bottom",
-          legend.title = element_blank(),
-          legend.text = element_text(family = "mono", size = 15),
+          legend.title = ggplot2::element_blank(),
+          legend.text = 
+            ggplot2::element_text(size = 15),
           legend.direction = "vertical",
-          plot.margin = unit(c(0, 0, 0, 0), "cm")) +
-          scale_fill_manual(
-            values = c("Antagonists" = "#FDE725", "Companions" = "#7AD151"))
+          plot.margin = 
+            ggplot2::unit(c(0, 0, 0, 0), "cm")) +
+        ggplot2::scale_fill_manual(
+          values = c("Antagonists" = "#FDE725", "Companions" = "#7AD151"))
     })
   
   # Friend list:
@@ -175,14 +165,14 @@ server <- function(input, output, session) {
   # All plants & their friends/does in a download-friendly format:
   combo_list_csv <- 
     reactive({
-      bind_rows(
-        get_friends(clean_data, input$plantVector) %>% 
-          mutate(type = "friends"),
-        get_foes(clean_data, input$plantVector) %>% 
-          mutate(type = "foes")) %>% 
-        rename(list = second_plant) %>% 
-        relocate(type, .before = "list") %>% 
-        arrange(plant)})
+      dplyr::bind_rows(
+        get_type(clean_data, input$plantVector, "Companions") |> 
+          dplyr::mutate(type = "friends"),
+        get_type(clean_data, input$plantVector, "Antagonists") |> 
+          dplyr::mutate(type = "foes")) |> 
+        dplyr::rename(list = second_plant) |> 
+        dplyr::relocate(type, .before = "list") |> 
+        dplyr::arrange(plant)})
 
   # Download handler:
   output$downloadData <- 
@@ -203,16 +193,6 @@ server <- function(input, output, session) {
     }
     updateStore(session, "plantVector", isolate(input$plantVector))
   })
-  
-  # About
-  output$about <- 
-    renderUI({
-      HTML(
-        "<h4>Creator: Abby Walter
-        <br>Repository: <a href = 'https://github.com/lawalter/gardenhelpr'>https://github.com/lawalter/gardenhelpr</a></br></br>
-        <p>Notes:</p></h4>
-        <p>
-        <ul><li>American varieties were chosen over others when possible (e.g., pennyroyal).</li></ul></p>")})
   
 }
 
