@@ -58,7 +58,7 @@ ui <-
           br(),
           downloadButton("downloadData", "Download full list as .csv"),
           br(),
-        width = 5
+        width = 7
         )
       ),
       
